@@ -305,7 +305,7 @@ if __name__=="__main__":
     # probabilities
     try:
         dat.print_probabilities()
-        dat.export_probabilities(save=args.savedir)
+        dat.export_probabilities(savedir=args.savedir)
     except:
         pass
     # plot images
