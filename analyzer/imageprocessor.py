@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ -*- coding: utf-8 -*-
 """
 # Image processing module
 
@@ -19,9 +19,11 @@ class ImageProcessor:
         """load patch with mask"""
         image = OpenSlide(filein)
         res = []
+        lst_number = []
         ap = res.append
-        for number in np.array(range(len(mask.flatten())))[mask.flatten()]:
+        for number in np.where(mask.flatten())[0]:
             v_h, v_w = divmod(number, mask.shape[1])
+            lst_number.append(number)
             for i in range(int(patch_size/model_patch_size)):
                 for v in range(int(patch_size/model_patch_size)):
                     patch_image=image.read_region(

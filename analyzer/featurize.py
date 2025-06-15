@@ -2,6 +2,7 @@
 """
 # featurize module 
 only ResNet18, BarlowTwins models 
+for training classification models
 
 @author: Katsuhisa MORITA
 """
@@ -64,17 +65,15 @@ def main():
         mask = dat.ImageProcessor.get_mask_inside(
             filein=filein, 
             patch_size=args.patch_size2,
-            slice_min_patch=100
+            slice_min_patch=100,
         )
         locations=[
             dat.ImageProcessor.get_locations(
-                filein=filein, 
                 mask=mask, 
                 patch_size=args.patch_size2,
                 model_patch_size=args.patch_size1,
             ),# small size
             dat.ImageProcessor.get_locations(
-                filein=filein, 
                 mask=mask, 
                 patch_size=args.patch_size2,
                 model_patch_size=args.patch_size2,
@@ -94,7 +93,7 @@ def main():
                 patch_size=args.patch_size2
             ),            
         ]
-        x =self.FindingClassifier._featurize(
+        x =dat.FindingClassifier._featurize(
             data_loaders, num_pool=int(args.patch_size1/args.patch_size2)**2
         )
         x=np.max(x, axis=0) # (,1536)

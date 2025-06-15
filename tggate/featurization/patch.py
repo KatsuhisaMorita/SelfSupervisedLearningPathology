@@ -5,18 +5,22 @@
 @author: Katsuhisa MORITA
 """
 # path setting
-PROJECT_PATH = '/workspace/tggate'
+PROJECT_PATH = '/workspace/pathology'
 
 # packages installed in the current environment
 import sys
 import datetime
 import argparse
 import time
+import os
 
 import numpy as np
 import pandas as pd
 import torch
 import torchvision.transforms as transforms
+from PIL import ImageOps, Image
+import cv2
+from openslide import OpenSlide
 
 # original packages in src
 sys.path.append(f"{PROJECT_PATH}/src/SelfSupervisedLearningPathology")
@@ -32,7 +36,7 @@ parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('--num_pool_patch', type=int, default=256)
 parser.add_argument('--model_name', type=str, default='ResNet18') # architecture name
 parser.add_argument('--ssl_name', type=str, default='barlowtwins') # ssl architecture name
-parser.add_argument('--dir_model', type=str, default='')
+parser.add_argument('--model_path', type=str, default='')
 parser.add_argument('--result_name', type=str, default='')
 parser.add_argument('--folder_name', type=str, default='')
 parser.add_argument('--pretrained', action='store_true')
@@ -73,7 +77,7 @@ class Dataset_Patch(torch.utils.data.Dataset):
                 out_data = t(out_data)
         return out_data
 
-def prepare_dataset_patch(filein:str="", batch_size:int=32, num_patch:int=200):
+def prepare_dataset_patch(filein:str="", batch_size:int=32, ):
     """
     data preparation
     
@@ -90,7 +94,6 @@ def prepare_dataset_patch(filein:str="", batch_size:int=32, num_patch:int=200):
     dataset = Dataset_Patch(
         filein=filein,
         transform=data_transform,
-        num_patch=num_patch,
         )
     # to loader
     data_loader = sslmodel.data_handler.prep_dataloader(
@@ -123,13 +126,13 @@ def main():
     model = utils.prepare_model_eval(
         model_name=args.model_name, 
         ssl_name=args.ssl_name, 
-        model_path=args.dir_model,
+        model_path=args.model_path,
         pretrained=args.pretrained,
         DEVICE=DEVICE
         )
     ## file names
     if args.tggate_all:
-        lst_filein=[f"/work/gd43/share/tggates/liver/batch_all/batch_{i}.npy" for i in range(64)]
+        lst_filein=[f"/workspace/HDD3/TGGATEs/batch_all/batch_{i}.npy" for i in range(64)]
     if args.tggate:
         df_info=pd.read_csv(settings.file_tggate)
         lst_filein=df_info["DIR_PATCH"].tolist()   
